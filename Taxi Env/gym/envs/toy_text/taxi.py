@@ -3,7 +3,7 @@ from six import StringIO
 from gym import utils
 from gym.envs.toy_text import discrete
 import numpy as np
-
+#The map for the taxi cab problem.
 MAP = [
     "+---------+",
     "|R: | : :G|",
@@ -29,7 +29,7 @@ class TaxiEnv(discrete.DiscreteEnv):
 
     """
     metadata = {'render.modes': ['human', 'ansi']}
-
+    #The init function initialises the transition function that maps state,action to newState,reward.
     def __init__(self):
         self.desc = np.asarray(MAP,dtype='c')
         self.locs = locs = [(0,0), (0,4), (4,0), (4,3)]
