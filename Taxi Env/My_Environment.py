@@ -30,7 +30,7 @@ class My_Environment(taxi.TaxiEnv):
 		#the taxi can take 6 actions, east,west,north,south,pickup and dropoff.
 		assert len(action.intArray)==1,"Expected 1 integer action."
 		assert action.intArray[0]>=0, "Expected action to be in [0,5]"
-		assert action.intArray[0]<5, "Expected action to be in [0,5]"
+		assert action.intArray[0]<6, "Expected action to be in [0,5]"
 		#step function is defined in gym/envs/toy_text/discrete.py, the DiscreteEnv class defined in there is inherited by TaxiEnv which MY_Environment inherits.
 		s1, r1, d1, k1=self.step(action.intArray[0])
 		returnRO=Reward_observation_terminal()
