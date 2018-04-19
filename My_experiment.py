@@ -1,29 +1,21 @@
 import sys
 import math
-import os
-import os.path
 import rlglue.RLGlue as RLGlue
 
 def offlineDemo():
+	statistics=[];
 	this_score=evaluateAgent();
 	printScore(0,this_score);
-	theFile = open("results.csv", "w");
-	theFile.close();
-	if os.path.isfile("Archive.csv"):
-		os.remove('Archive.csv')
-	for i in range(0,200):
+	statistics.append(this_score);
+	
+	for i in range(0,50):
 		for j in range(0,50):
 			RLGlue.RL_episode(0);
-			RLGlue.RL_env_message("stop print")
-			if j%20==0 and i>0 :
-				RLGlue.RL_env_message("print");
-			printScore((i+1)*50,this_score);
 		this_score=evaluateAgent();
 		printScore((i+1)*50,this_score);
-		theFile = open("results.csv", "a");
-		theFile.write("%d\t%.2f\t%.2f\n" % ((i)*50, this_score[0], this_score[1]))
-		theFile.close();
-	os.rename('results.csv', 'Archive.csv')	
+		statistics.append(this_score);
+	
+	saveResultToCSV(statistics,"results.csv");
 
 def printScore(afterEpisodes, score_tuple):
 	print "%d\t\t%.2f\t\t%.2f" % (afterEpisodes, score_tuple[0], score_tuple[1])
@@ -56,6 +48,17 @@ def evaluateAgent():
 	RLGlue.RL_agent_message("unfreeze learning");
 	return mean,standard_dev;
 
+
+def saveResultToCSV(statistics, fileName):
+	theFile = open(fileName, "w");
+
+	for thisEntry in statistics:
+		theFile.write("%.2f, " % thisEntry[0])
+		theFile.write("\t");
+		theFile.write("%.2f, " % thisEntry[1])
+		theFile.write("\n")
+		
+	theFile.close();
 
 
 #
@@ -92,7 +95,6 @@ single_evaluation();
 
 RLGlue.RL_cleanup();
 print "\nProgram Complete."
-
 
 
 
