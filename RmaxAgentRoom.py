@@ -92,16 +92,22 @@ class Rmax_agent(Agent):
 		lastState=self.lastObservation.doubleArray
 		lastAction=self.lastAction.intArray[0]
 		R=reward
+		#tile code takes state information, namely x,y and orientation and returns the tiles which encode this state.
 		tilecode(lastState[0],lastState[1],lastState[2],self.F)
 		Q=self.Qs(self.F)
 		
-
+		#The agent maintains reward model for each (tile,action) pair, when you visit a state and take action a
+		#and get reward 'R' this reward is distributed evenly among all the tiles that encode that state.
+		
 		for i in self.F:
 		# replacing traces
 			self.e[i + (lastAction*numTiles)] = 1
 			self.rsum[i][lastAction]+= R
 			self.C_t_a[i][lastAction]+= 1
-		
+		#Until we have visited a (tile,action) pair M times we assume that it is unknown and that the pair leads to maximum reward.
+		#(tile,action)=(t,a) means that you take action a on tile t.
+		#once a tile, action pair has been visited enough times it becomes known and we use the average reward for that pair which is dervied from the reward model
+		#Then these reward values are used to derive a Q function which is used to get the optimal policy/best action for that state.
 		for i in self.F:
 			if self.C_t_a[i][lastAction]>=self.m:
 				self.rwrd[i][lastAction]=self.rsum[i][lastAction]/(self.C_t_a[i][lastAction]*4)
