@@ -18,6 +18,7 @@ class skeleton_agent(Agent):
     R = defaultdict(lambda: defaultdict(lambda: 0.0))
     T = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: 0.0)))
     #here are the variables keeping track of how many times we have visited a particular state and action pair, this data is used later.
+    #A state action pair is considered unknown until it has been visited 'm' times. It also assumed that any unknown pair always leads to max reward.
     C_s_a_s = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: 0)))
     C_s_a = defaultdict(lambda: defaultdict(lambda: 0))
     rsum = defaultdict(lambda: defaultdict(lambda: 0.0))
@@ -79,7 +80,9 @@ class skeleton_agent(Agent):
 
     def agent_start(self, observation):
         newState = observation.intArray[0]
-        x = self.egreedy(newState)
+        #for the action ,we select the one with the max Q value for a given state because the exploration part is taken care of Rmax's assumtion that all unknown (state,action) pairs lead to max reward
+        #This means that unknown actions automatically get explored first.
+        x = self.greedy(newState)
         returnAction = Action()
         returnAction.intArray = [x]
 
@@ -119,13 +122,13 @@ class skeleton_agent(Agent):
         	if self.Q[newState][a]>Q_sprime_aprime:
         		Q_sprime_aprime=self.Q[newState][a]
         new_Q_sa=Q_sa + self.sarsa_stepsize * (self.R[lastState][lastActionAgent] + self.sarsa_gamma * Q_sprime_aprime - Q_sa)
-        newIntAction=self.egreedy(newState)
+        newIntAction=self.greedy(newState)
         self.Q[lastState][lastActionAgent]=new_Q_sa
         #we use Q function values to derive the optimal policy, the paper does not mention what method to use here, so we are using Q values.
         #Value iteration over hundreds of states proved to be extremely expensive
         #therefore we have used Q values to solve the model of the agent to get an optimal policy.
 
-        x = self.egreedy(newState)
+        x = self.greedy(newState)
         returnAction = Action()
         returnAction.intArray = [x]
         self.lastAction=copy.deepcopy(returnAction)
@@ -145,7 +148,7 @@ class skeleton_agent(Agent):
     def agent_message(self, inMessage):
         pass
 
-    def egreedy(self, state):
+    def greedy(self, state):
         maxIndex=0
         a=1
         maxValue=-500000
