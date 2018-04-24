@@ -14,10 +14,10 @@ class skeleton_agent(Agent):
 
     lastAction = Action()
     lastObservation = Observation()
-
+    # R represents the agents model of the rewards for a particular state and action, T is the transition function.
     R = defaultdict(lambda: defaultdict(lambda: 0.0))
     T = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: 0.0)))
-
+    #here are the variables keeping track of how many times we have visited a particular state and action pair, this data is used later.
     C_s_a_s = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: 0)))
     C_s_a = defaultdict(lambda: defaultdict(lambda: 0))
     rsum = defaultdict(lambda: defaultdict(lambda: 0.0))
@@ -37,7 +37,7 @@ class skeleton_agent(Agent):
 
 
     def agent_init(self, taskSpec):
-        # See the sample_sarsa_agent in the mines-sarsa-example project for how to parse the task spec
+       
         TaskSpec = TaskSpecVRLGLUE3.TaskSpecParser(taskSpec)
         if TaskSpec.valid:
             assert len(TaskSpec.getIntObservations()) == 1, "expecting 1-dimensional discrete observations"
@@ -90,8 +90,8 @@ class skeleton_agent(Agent):
 
 
     def agent_step(self, reward, observation):
-        #x = agentPolicy()
-        #y = adversaryPolicy()
+        
+        
 
         newState = observation.intArray[0]
         lastState = self.lastObservation.intArray[0]
@@ -111,7 +111,8 @@ class skeleton_agent(Agent):
         else:
             self.R[lastState][lastActionAgent] = self.rmax
             self.T[lastState][lastActionAgent][newState] = 1.0
-
+        #the values of Reward as stored in the agents model are used to update the Q values, instead of using the reward from the env directly.
+        #the primary assumption of Rmax is optimism under uncertainity, we assume that any action from any state leads to maximum reward, until we have visited that (state,action) pair a certain number of times before we start using the averaged reward values.
         Q_sa=self.Q[lastState][lastActionAgent]
         Q_sprime_aprime=-500000
         for a in range(self.numActions):
@@ -120,7 +121,9 @@ class skeleton_agent(Agent):
         new_Q_sa=Q_sa + self.sarsa_stepsize * (self.R[lastState][lastActionAgent] + self.sarsa_gamma * Q_sprime_aprime - Q_sa)
         newIntAction=self.egreedy(newState)
         self.Q[lastState][lastActionAgent]=new_Q_sa
-
+        #we use Q function values to derive the optimal policy, the paper does not mention what method to use here, so we are using Q values.
+        #Value iteration over hundreds of states proved to be extremely expensive
+        #therefore we have used Q values to solve the model of the agent to get an optimal policy.
 
         x = self.egreedy(newState)
         returnAction = Action()
