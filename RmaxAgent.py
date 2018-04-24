@@ -10,7 +10,7 @@ from collections import defaultdict
 from random import Random
 
 
-class skeleton_agent(Agent):
+class rmax_agent(Agent):
 
     lastAction = Action()
     lastObservation = Observation()
