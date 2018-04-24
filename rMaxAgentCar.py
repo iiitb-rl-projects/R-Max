@@ -15,7 +15,7 @@ import random
 import copy
 from collections import defaultdict
 
-class sarsa_agent(Agent):
+class rmax_agent(Agent):
 
 
 	alpha = 0.05/numTilings
